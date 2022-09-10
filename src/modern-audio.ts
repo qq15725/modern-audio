@@ -1,4 +1,4 @@
-import { createProcessors, getProp, resetProcessors, setupProcessors } from './processor'
+import { createProcessors, getProcessorProp, resetProcessors, setupProcessors } from './processor'
 
 import type { AudioEnv, Processor } from './types'
 
@@ -26,8 +26,16 @@ export class ModernAudio extends HTMLAudioElement {
     this.setupConnections()
   }
 
+  protected setupListeners() {
+    this.addEventListener('play', () => this.env.context.resume())
+  }
+
   protected async setupConnections() {
     this.processors = await createProcessors(this.env)
+    for (let i = 0; i < this.attributes.length; i++) {
+      const attribute = this.attributes.item(i)
+      if (attribute) this.set(attribute.name, attribute.value)
+    }
     setupProcessors(this.processors)
   }
 
@@ -36,15 +44,11 @@ export class ModernAudio extends HTMLAudioElement {
     setupProcessors(this.processors)
   }
 
-  protected setupListeners() {
-    this.addEventListener('play', () => this.env.context.resume())
-  }
-
   public get(name: string) {
-    return getProp(name, this.processors)?.getter?.()
+    return getProcessorProp(name, this.processors)?.getter?.()
   }
 
   public set(name: string, value: any) {
-    return getProp(name, this.processors)?.setter?.(value)
+    return getProcessorProp(name, this.processors)?.setter?.(value)
   }
 }

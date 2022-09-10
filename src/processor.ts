@@ -45,7 +45,7 @@ export function resetProcessors(processors: Processor[]) {
   })
 }
 
-export function getProp(name: string, processors: Processor[]) {
+export function getProcessorProp(name: string, processors: Processor[]) {
   for (const processor of processors) {
     if (!processor.props) {
       continue

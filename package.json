@@ -1,16 +1,50 @@
 {
   "name": "modern-audio",
   "version": "0.0.1",
-  "private": true,
-  "sideEffects": false,
-  "scripts": {
-    "dev": "vite"
+  "packageManager": "pnpm@7.0.0",
+  "description": "Modern audio",
+  "main": "dist/modern-audio.js",
+  "module": "dist/modern-audio.mjs",
+  "types": "types/index.d.ts",
+  "browser": "dist/modern-audio.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qq15725/modern-audio.git"
   },
+  "bugs": {
+    "url": "https://github.com/qq15725/modern-audio/issues"
+  },
+  "homepage": "https://github.com/qq15725/modern-audio",
   "engines": {
     "node": ">=14"
   },
+  "keywords": [
+    "modern-audio",
+    "audio",
+    "noise-reduction"
+  ],
+  "license": "MIT",
+  "author": "wxm",
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "types"
+  ],
+  "exports": {
+    ".": {
+      "require": "./dist/modern-audio.cjs",
+      "import": "./dist/modern-audio.mjs"
+    }
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && tsc --project tsconfig.build.json",
+    "release": "bumpp package.json --commit \"chore(release): publish v%s\" --push --tag && pnpm publish"
+  },
   "devDependencies": {
     "@qq15725/eslint-config": "^1.1.0",
+    "@types/node": "^18.7.16",
+    "bumpp": "^8.2.1",
     "eslint": "^8.23.0",
     "typescript": "^4.8.3",
     "vite": "^3.1.0"
