@@ -1,3 +1,22 @@
-export * from './noise-reduction'
-export * from './panner'
-export * from './volume'
+import { Analyser } from './analyser'
+import { Destination } from './destination'
+import { NoiseReduction } from './noise-reduction'
+import { Panner } from './panner'
+import { Source } from './source'
+import { Volume } from './volume'
+
+import type { ProcessorFactory } from '../types'
+
+export function createProcessorFactories(userProcessorFactories?: ProcessorFactory[]) {
+  userProcessorFactories = userProcessorFactories || []
+
+  return [
+    Source,
+    NoiseReduction,
+    Volume,
+    Panner,
+    ...userProcessorFactories,
+    Analyser,
+    Destination,
+  ]
+}

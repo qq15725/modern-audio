@@ -1,58 +1,50 @@
-import { createPanner, createVolume, createNoiseReduction } from './processors'
+import { createProcessors, getProp, resetProcessors, setupProcessors } from './processor'
+
+import type { AudioEnv, Processor } from './types'
 
 export class ModernAudio extends HTMLAudioElement {
-  protected processors: {
-    volume: ReturnType<typeof createVolume>
-    panner: ReturnType<typeof createPanner>
-    noiseReduction: ReturnType<typeof createNoiseReduction>
-  }
-
-  public get db() {
-    return this.processors.volume.get()
-  }
-
-  public set db(value) {
-    this.processors.volume.set(value)
-  }
-
-  public get pan() {
-    return this.processors.panner.get()
-  }
-
-  public set pan(value) {
-    this.processors.panner.set(value)
-  }
-
-  public set noiseReduction(value) {
-    this.processors.noiseReduction.set(value)
-  }
-
-  public get noiseReduction() {
-    return this.processors.noiseReduction.get()
-  }
+  protected env: AudioEnv
+  protected processors: Processor[] = []
 
   constructor() {
-    super();
+    super()
     const context = new AudioContext()
-    const source = context.createMediaElementSource(this)
-
-    this.processors = {
-      volume: createVolume(context),
-      panner: createPanner(context),
-      noiseReduction: createNoiseReduction(context),
+    this.env = {
+      context,
+      source: context.createMediaElementSource(this),
+      reconnect: this.resetConnections.bind(this),
     }
-
-    Object.values(this.processors)
-      .reduce((prev, next) => prev.connect(next.node), source)
-      .connect(context.destination)
-
-    this.pan = Number(this.getAttribute('pan') || 0)
-    this.db = Number(this.getAttribute('db') || 0)
+    this.setup()
   }
 
   public static install() {
-    customElements.define('modern-audio', ModernAudio, {
-      extends: 'audio',
-    })
+    customElements.define('modern-audio', ModernAudio, { extends: 'audio' })
+  }
+
+  protected setup() {
+    this.setupListeners()
+    this.setupConnections()
+  }
+
+  protected async setupConnections() {
+    this.processors = await createProcessors(this.env)
+    setupProcessors(this.processors)
+  }
+
+  protected resetConnections() {
+    resetProcessors(this.processors)
+    setupProcessors(this.processors)
+  }
+
+  protected setupListeners() {
+    this.addEventListener('play', () => this.env.context.resume())
+  }
+
+  public get(name: string) {
+    return getProp(name, this.processors)?.getter?.()
+  }
+
+  public set(name: string, value: any) {
+    return getProp(name, this.processors)?.setter?.(value)
   }
 }
