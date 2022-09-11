@@ -2,7 +2,7 @@
   "name": "modern-audio",
   "version": "0.0.1",
   "packageManager": "pnpm@7.0.0",
-  "description": "Modern audio",
+  "description": "A modern web audio lib",
   "main": "dist/modern-audio.js",
   "module": "dist/modern-audio.mjs",
   "types": "types/index.d.ts",
@@ -21,6 +21,7 @@
   "keywords": [
     "modern-audio",
     "audio",
+    "web-audio",
     "noise-reduction"
   ],
   "license": "MIT",
