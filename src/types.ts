@@ -1,10 +1,10 @@
 export interface AudioEnv {
-  source: MediaElementAudioSourceNode
+  source: MediaElementAudioSourceNode | AudioBufferSourceNode
   context: AudioContext | OfflineAudioContext
   reconnect: () => void
 }
 
-export interface PropType<T = any, D = T> {
+export interface ProcessorPropType<T = any, D = T> {
   getter?: () => T
   setter?: (value: D) => void
 }
@@ -18,7 +18,7 @@ export interface Processor {
   node: AudioNode | ProcessorNodeFunction
   connect?: (target: AudioNode) => void
   disconnect?: () => void
-  props?: Record<string, PropType>
+  props?: Record<string, ProcessorPropType>
 }
 
 export interface ProcessorFactory {

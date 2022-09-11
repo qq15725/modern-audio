@@ -1,3 +1,4 @@
+import { toCameCase } from './utils'
 import { createProcessors, getProcessorProp, resetProcessors, setupProcessors } from './processor'
 
 import type { AudioEnv, Processor } from './types'
@@ -45,10 +46,10 @@ export class ModernAudio extends HTMLAudioElement {
   }
 
   public get(name: string) {
-    return getProcessorProp(name, this.processors)?.getter?.()
+    return getProcessorProp(toCameCase(name), this.processors)?.getter?.()
   }
 
   public set(name: string, value: any) {
-    return getProcessorProp(name, this.processors)?.setter?.(value)
+    return getProcessorProp(toCameCase(name), this.processors)?.setter?.(value)
   }
 }

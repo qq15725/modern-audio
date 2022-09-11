@@ -27,6 +27,8 @@ export const NoiseReduction = defineProcessor(({ context, reconnect }) => {
       noiseReduction: {
         getter: () => enable,
         setter: (value: boolean) => {
+          // @ts-expect-error runtime
+          if (value === '') value = true
           if (enable === value) return
           enable = value
           reconnect()
