@@ -1,7 +1,26 @@
+export type AudioSource = MediaElementAudioSourceNode | AudioScheduledSourceNode | AudioBufferSourceNode
+
 export interface AudioEnv {
-  source: MediaElementAudioSourceNode | AudioBufferSourceNode
+  source: AudioSource
   context: AudioContext | OfflineAudioContext
   reconnect: () => void
+}
+
+export interface InternalAudio {
+  processors: Processor[]
+  setupProcessors: () => Promise<void>
+  connectProcessors: () => void
+  reconnectProcessors: () => void
+  get: (name: string) => any
+  set: (name: string, value: any) => any
+}
+
+export interface Processor {
+  name: string
+  node: AudioNode | ProcessorNodeFunction
+  connect?: (target: AudioNode) => void
+  disconnect?: () => void
+  props?: Record<string, ProcessorPropType>
 }
 
 export interface ProcessorPropType<T = any, D = T> {
@@ -11,14 +30,6 @@ export interface ProcessorPropType<T = any, D = T> {
 
 export interface ProcessorNodeFunction {
   (): AudioNode | undefined
-}
-
-export interface Processor {
-  name: string
-  node: AudioNode | ProcessorNodeFunction
-  connect?: (target: AudioNode) => void
-  disconnect?: () => void
-  props?: Record<string, ProcessorPropType>
 }
 
 export interface ProcessorFactory {

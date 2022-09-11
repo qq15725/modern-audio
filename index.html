@@ -17,10 +17,26 @@
 >
 </audio>
 
+<div>
+  <button>Download</button>
+</div>
+
 <script type="module">
   import { ModernAudio } from './src'
 
   ModernAudio.install()
+</script>
+
+<script type="module" async>
+  import { createModernAudio, createOfflineAudioContext, downloadOfflineAudio } from './src'
+
+  const context = createOfflineAudioContext(10)
+  const audio = createModernAudio('./test/assets/audio.mp3', context)
+
+  document.querySelector('button').onclick = () => {
+    audio.start()
+    downloadOfflineAudio(context)
+  }
 </script>
 </body>
 </html>

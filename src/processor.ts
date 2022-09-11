@@ -1,6 +1,6 @@
 import { createProcessorFactories } from './processors'
 
-import type { AudioEnv, Processor, ProcessorFactory } from './types'
+import type { AudioEnv, Processor, ProcessorFactory, ProcessorPropType } from './types'
 
 export function defineProcessor(processorFactory: ProcessorFactory) {
   return processorFactory
@@ -45,16 +45,13 @@ export function resetProcessors(processors: Processor[]) {
   })
 }
 
-export function getProcessorProp(name: string, processors: Processor[]) {
+export function processorsToProps(processors: Processor[]): Map<string, ProcessorPropType> {
+  const map = new Map<string, ProcessorPropType>()
   for (const processor of processors) {
-    if (!processor.props) {
-      continue
-    }
+    if (!processor.props) continue
     for (const propName in processor.props) {
-      if (propName === name) {
-        return processor.props[propName]
-      }
+      map.set(propName, processor.props[propName])
     }
   }
-  return undefined
+  return map
 }

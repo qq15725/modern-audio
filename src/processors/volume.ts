@@ -1,5 +1,5 @@
 import { defineProcessor } from '../processor'
-import { getDuration, getPlaybackRate } from '../utils'
+import { getSourceDuration, getSourcePlaybackRate } from '../source'
 
 export const Volume = defineProcessor(({ context, source }) => {
   const node = context.createGain()
@@ -39,7 +39,7 @@ export const Volume = defineProcessor(({ context, source }) => {
           const now = context.currentTime
           node.gain.setTargetAtTime(
             0,
-            now + getDuration(source) / getPlaybackRate(source) - time,
+            now + getSourceDuration(source) / getSourcePlaybackRate(source) - time,
             time / 3,
           )
         },
