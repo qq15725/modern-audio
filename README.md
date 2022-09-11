@@ -12,6 +12,15 @@
   </a>
 </p>
 
+## Feature
+
+- Adjustment decibel
+- Adjustment fade in
+- Adjustment fade out
+- Adjustment stereo
+- Enable noise reduction
+- Export multiple audio as single wav file
+
 ## Installation
 
 ### pnpm
@@ -36,10 +45,19 @@ import { ModernAudio } from 'modern-audio'
 ModernAudio.install()
 ```
 
-use web custom component
+web custom component
 
 ```html
-<audio is="modern-audio" src="./test/assets/audio.mp3" controls></audio>
+<audio
+  is="modern-audio"
+  src="./test/assets/audio.mp3"
+  controls
+  db="1"
+  pan="0.1"
+  fade-in="3"
+  fade-out="5"
+  noise-reduction
+></audio>
 ```
 
 ### CDN of usage
