@@ -1,36 +1,9 @@
 import { getBindProp, toCameCase } from './utils'
 import { fetchAudioBuffer } from './fetch'
+import { drawBarChart, drawTimeDomainBarChart } from './drawer'
 import { createProcessors, processorsToProps, resetProcessors, setupProcessors } from './processor'
 
 import type { AudioSource, InternalAudio, Processor, ProcessorPropType } from './types'
-
-export class ModernAudio extends HTMLAudioElement {
-  public source: { context: AudioContext } & InternalAudio & MediaElementAudioSourceNode
-
-  constructor() {
-    super()
-    this.source = createModernAudio(this)
-    this.setup()
-  }
-
-  public static install() {
-    customElements.define('modern-audio', ModernAudio, { extends: 'audio' })
-  }
-
-  protected async setup() {
-    this.setupListeners()
-    await this.source.setupProcessors()
-    for (let i = 0; i < this.attributes.length; i++) {
-      const attribute = this.attributes.item(i)
-      if (attribute) this.source.set(attribute.name, attribute.value)
-    }
-    this.source.connectProcessors()
-  }
-
-  protected setupListeners() {
-    this.addEventListener('play', () => this.source.context.resume())
-  }
-}
 
 export function createModernAudio<T extends BaseAudioContext = AudioContext>(userSource: string, userContext?: T): { context: T } & InternalAudio & AudioBufferSourceNode
 export function createModernAudio<T extends BaseAudioContext = AudioContext>(userSource: HTMLMediaElement, userContext?: T): { context: T } & InternalAudio & MediaElementAudioSourceNode
@@ -95,6 +68,17 @@ export function createModernAudio(userSource: string | HTMLMediaElement | AudioS
     reconnectProcessors: reconnect,
     get,
     set,
+    renderBarChart: (canvas, color) => drawBarChart(
+      canvas,
+      color,
+      source instanceof MediaElementAudioSourceNode ? source.mediaElement.src : source as unknown as string,
+      context,
+    ),
+    renderTimeDomainBarChart: (canvas, color) => drawTimeDomainBarChart(
+      canvas,
+      color,
+      processors.find(v => v.name === 'analyser')!.node as any,
+    ),
   }
 
   return new Proxy(source, {
@@ -110,4 +94,32 @@ export function createModernAudio(userSource: string | HTMLMediaElement | AudioS
       return true
     },
   }) as any
+}
+
+export class ModernAudio extends HTMLAudioElement {
+  public source: { context: AudioContext } & InternalAudio & MediaElementAudioSourceNode
+
+  constructor() {
+    super()
+    this.source = createModernAudio(this)
+    this.setup()
+  }
+
+  public static install() {
+    customElements.define('modern-audio', ModernAudio, { extends: 'audio' })
+  }
+
+  protected async setup() {
+    this.setupListeners()
+    await this.source.setupProcessors()
+    for (let i = 0; i < this.attributes.length; i++) {
+      const attribute = this.attributes.item(i)
+      if (attribute) this.source.set(attribute.name, attribute.value)
+    }
+    this.source.connectProcessors()
+  }
+
+  protected setupListeners() {
+    this.addEventListener('play', () => this.source.context.resume())
+  }
 }

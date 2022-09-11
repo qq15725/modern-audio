@@ -19,6 +19,8 @@
 - Adjustment fade out
 - Adjustment stereo
 - Enable noise reduction
+- Render bar chart
+- Render time domain bar chart
 - Export multiple audio as single wav file
 
 ## Installation

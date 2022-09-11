@@ -11,6 +11,8 @@ export interface InternalAudio {
   setupProcessors: () => Promise<void>
   connectProcessors: () => void
   reconnectProcessors: () => void
+  renderBarChart: (canvas: HTMLCanvasElement, color?: string) => void
+  renderTimeDomainBarChart: (canvas: HTMLCanvasElement, color?: string) => void
   get: (name: string) => any
   set: (name: string, value: any) => any
 }

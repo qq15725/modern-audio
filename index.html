@@ -17,8 +17,14 @@
 >
 </audio>
 
+<canvas></canvas>
+
 <div>
-  <button>Download</button>
+  <button id="bar-chart">BarChart</button>
+</div>
+
+<div>
+  <button id="download">Download</button>
 </div>
 
 <script type="module">
@@ -33,7 +39,11 @@
   const context = createOfflineAudioContext(10)
   const audio = createModernAudio('./test/assets/audio.mp3', context)
 
-  document.querySelector('button').onclick = () => {
+  document.querySelector('#bar-chart').onclick = () => {
+    audio.renderBarChart(document.querySelector('canvas'))
+  }
+
+  document.querySelector('#download').onclick = () => {
     audio.start()
     downloadOfflineAudio(context)
   }
