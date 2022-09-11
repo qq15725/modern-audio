@@ -29,7 +29,7 @@ export async function drawBarChart(canvas: HTMLCanvasElement, color = '#364356',
   const gap = Math.max(pixelRatio, ~~(bar / 2))
   const step = bar + gap
 
-  ctx.clearRect(0, 0, width, height);
+  ctx.clearRect(0, 0, width, height)
 
   for (let peakIndex = 0; peakIndex < peaks.length; peakIndex += step) {
     let peak = 0
