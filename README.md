@@ -63,6 +63,7 @@ import { createModernAudio, createOfflineAudioContext, downloadOfflineAudio } fr
 
 // 10s duration
 const context = createOfflineAudioContext(10)
+
 const audio = createModernAudio('./test/assets/audio.mp3', context)
 
 audio.set('db', 1)
