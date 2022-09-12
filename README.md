@@ -19,8 +19,8 @@
 - Adjustment fade out
 - Adjustment stereo
 - Enable noise reduction
-- Render audio peaks bar chart
-- Render audio peaks time domain bar chart
+- Render bar chart from peaks data
+- Render bar chart from peaks time domain data
 - Export multiple audio as single wav file
 
 ## Installation
