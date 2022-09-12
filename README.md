@@ -42,12 +42,58 @@ npm i modern-audio
 ### Basic
 
 ```ts
+import { createModernAudio } from 'modern-audio'
+
+const audio = createModernAudio('./test/assets/audio.mp3')
+
+audio.set('db', 1)
+audio.set('pan', 0.1)
+audio.set('fadeIn', 3)
+audio.set('fadeOut', 5)
+audio.set('noiseReduction', true)
+
+// onclick after call
+audio.start()
+```
+
+### Export multiple audio as single wav file
+
+```ts
+import { createModernAudio, createOfflineAudioContext, downloadOfflineAudio } from 'modern-audio'
+
+// 10s duration
+const context = createOfflineAudioContext(10)
+const audio = createModernAudio('./test/assets/audio.mp3', context)
+
+audio.set('db', 1)
+audio.set('pan', 0.1)
+audio.set('fadeIn', 3)
+audio.set('fadeOut', 5)
+audio.set('noiseReduction', true)
+
+const audio1 = createModernAudio('./test/assets/audio.mp3', context)
+
+audio1.set('db', 0)
+audio1.set('pan', 0)
+audio1.set('fadeIn', 0)
+audio1.set('fadeOut', 0)
+audio1.set('noiseReduction', false)
+
+// onclick after call
+audio.start()
+audio1.start()
+downloadOfflineAudio(context)
+```
+
+### Web custom component
+
+```ts
 import { ModernAudio } from 'modern-audio'
 
 ModernAudio.install()
 ```
 
-web custom component
+html
 
 ```html
 <audio
@@ -76,7 +122,16 @@ web custom component
   </script>
 </head>
 <body>
-  <audio is="modern-audio" src="./test/assets/audio.mp3" controls></audio>
+  <audio
+    is="modern-audio"
+    src="./test/assets/audio.mp3"
+    controls
+    db="1"
+    pan="0.1"
+    fade-in="3"
+    fade-out="5"
+    noise-reduction
+  ></audio>
 </body>
 </html>
 ```
