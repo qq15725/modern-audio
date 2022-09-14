@@ -25,10 +25,9 @@ export const Volume = defineProcessor(({ context, source }) => {
         setter: (time: number) => {
           time = Number(time)
           props.fadeIn = time
-          const value = node.gain.value
           const now = context.currentTime
           node.gain.setValueAtTime(0.01, now)
-          node.gain.exponentialRampToValueAtTime(value, now + time)
+          node.gain.exponentialRampToValueAtTime(node.gain.value, now + time)
         },
       },
       fadeOut: {
@@ -36,12 +35,10 @@ export const Volume = defineProcessor(({ context, source }) => {
         setter: (time: number) => {
           time = Number(time)
           props.fadeOut = time
+          const duration = getSourceDuration(source) / getSourcePlaybackRate(source)
           const now = context.currentTime
-          node.gain.setTargetAtTime(
-            0,
-            now + getSourceDuration(source) / getSourcePlaybackRate(source) - time,
-            time / 3,
-          )
+          node.gain.setValueAtTime(node.gain.value, now + duration - time)
+          node.gain.exponentialRampToValueAtTime(0.01, now + duration)
         },
       },
     },
