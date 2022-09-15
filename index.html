@@ -11,9 +11,8 @@
   src="./test/assets/audio.mp3"
   controls
   pan="0"
-  db="0"
-  fade-in="5"
-  fade-out="5"
+  fade-in="10"
+  fade-out="108"
 >
 </audio>
 
@@ -34,10 +33,10 @@
 </script>
 
 <script type="module" async>
-  import { createModernAudio, createOfflineAudioContext, downloadOfflineAudio } from './src'
+  import { createAudio, createOfflineAudioContext, downloadOfflineAudio } from './src'
 
   const context = createOfflineAudioContext(10)
-  const audio = createModernAudio('./test/assets/audio.mp3', context)
+  const audio = createAudio('./test/assets/audio.mp3', context)
 
   document.querySelector('#bar-chart').onclick = () => {
     audio.renderBarChart(document.querySelector('canvas'))

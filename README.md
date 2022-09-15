@@ -42,9 +42,9 @@ npm i modern-audio
 ### Basic
 
 ```ts
-import { createModernAudio } from 'modern-audio'
+import { createAudio } from 'modern-audio'
 
-const audio = createModernAudio('./test/assets/audio.mp3')
+const audio = createAudio('./test/assets/audio.mp3')
 
 audio.set('db', 1)
 audio.set('pan', 0.1)
@@ -59,12 +59,12 @@ audio.start()
 ### Export multiple audio as single wav file
 
 ```ts
-import { createModernAudio, createOfflineAudioContext, downloadOfflineAudio } from 'modern-audio'
+import { createAudio, createOfflineAudioContext, downloadOfflineAudio } from 'modern-audio'
 
 // 10s duration
 const context = createOfflineAudioContext(10)
 
-const audio = createModernAudio('./test/assets/audio.mp3', context)
+const audio = createAudio('./test/assets/audio.mp3', context)
 
 audio.set('db', 1)
 audio.set('pan', 0.1)
@@ -72,7 +72,7 @@ audio.set('fadeIn', 3)
 audio.set('fadeOut', 5)
 audio.set('noiseReduction', true)
 
-const audio1 = createModernAudio('./test/assets/audio.mp3', context)
+const audio1 = createAudio('./test/assets/audio.mp3', context)
 
 audio1.set('db', 0)
 audio1.set('pan', 0)

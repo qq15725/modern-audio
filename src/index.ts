@@ -1,4 +1,5 @@
 export { defineProcessor } from './processor'
+export * from './audio'
 export * from './modern-audio'
 export * from './offline-audio'
 export * from './types'

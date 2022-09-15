@@ -17,6 +17,12 @@ export interface InternalAudio {
   set: (name: string, value: any) => any
 }
 
+export type BufferAudio<T extends BaseAudioContext = AudioContext> = { context: T } & InternalAudio & AudioBufferSourceNode
+
+export type MediaElementAudio<T extends BaseAudioContext = AudioContext> = { context: T } & InternalAudio & MediaElementAudioSourceNode
+
+export type ScheduledAudio<T extends BaseAudioContext = AudioContext> = { context: T } & InternalAudio & AudioScheduledSourceNode
+
 export interface Processor {
   name: string
   node: AudioNode | ProcessorNodeFunction
