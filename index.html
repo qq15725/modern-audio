@@ -18,7 +18,11 @@
 
 <canvas></canvas>
 
-<div>
+<div style="margin-bottom: 10px;">
+  <button id="play">Play</button>
+</div>
+
+<div style="margin-bottom: 10px;">
   <button id="bar-chart">BarChart</button>
 </div>
 
@@ -35,19 +39,31 @@
 <script type="module" async>
   import { createAudio, createOfflineAudioContext, downloadOfflineAudio } from './src'
 
-  const context = createOfflineAudioContext(10)
-  const audio = createAudio('./test/assets/audio.mp3', context)
-
+  const audio = await createAudio('./test/assets/audio.mp3')
   await audio.load()
-
-  audio.set('playbackRate', 2)
-
+  audio.set('playbackRate', 1.2)
+  document.querySelector('#play').onclick = (e) => {
+    const el = e.target
+    const isPlaying = el.dataset.playing === 'true'
+    el.dataset.playing = !isPlaying
+    if (isPlaying) {
+      el.innerHTML = 'Play'
+      audio.stop()
+    } else {
+      el.innerHTML = 'Pause'
+      audio.start(0, audio.context.currentTime)
+    }
+  }
   document.querySelector('#bar-chart').onclick = () => {
     audio.renderBarChart(document.querySelector('canvas'))
   }
 
+  const context = createOfflineAudioContext(10)
+  const offlineAudio = createAudio('./test/assets/audio.mp3', context)
+  await offlineAudio.load()
+  offlineAudio.set('playbackRate', 2)
   document.querySelector('#download').onclick = () => {
-    audio.start()
+    offlineAudio.start()
     downloadOfflineAudio(context)
   }
 </script>

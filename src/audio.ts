@@ -3,101 +3,132 @@ import { fetchAudioBuffer } from './fetch'
 import { drawBarChart, drawTimeDomainBarChart } from './drawer'
 import { createProcessors, processorsToProps, resetProcessors, setupProcessors } from './processor'
 
-import type { AudioSource, BufferAudio, InternalAudio, MediaElementAudio, Processor, ProcessorPropType, ScheduledAudio } from './types'
+import type { AudioAnyContext, AudioInput, AudioSource, BufferAudio, InternalAudio, MediaElementAudio, Processor, ProcessorPropType, ScheduledAudio } from './types'
 
-export function createAudio<T extends BaseAudioContext = AudioContext>(userSource: string, userContext?: T): BufferAudio<T>
-export function createAudio<T extends BaseAudioContext = AudioContext>(userSource: HTMLMediaElement, userContext?: T): MediaElementAudio<T>
-export function createAudio<T extends BaseAudioContext = AudioContext>(userSource: AudioSource, userContext?: T): BufferAudio<T> | MediaElementAudio<T> | ScheduledAudio<T>
-export function createAudio(userSource: string | HTMLMediaElement | AudioSource, userContext?: AudioContext | OfflineAudioContext) {
+function resovleInput<T extends BaseAudioContext = AudioAnyContext>(value: AudioInput, userContext?: T) {
   const context = userContext ?? new AudioContext()
 
-  let source: AudioSource
-  let src: string | undefined
-  if (typeof userSource === 'string') {
-    source = context.createBufferSource()
-    src = userSource
-  } else if (context instanceof AudioContext && userSource instanceof HTMLMediaElement) {
-    source = context.createMediaElementSource(userSource)
-    src = userSource.src
-  } else {
-    source = userSource as AudioSource
-  }
-
-  const processors: Processor[] = []
-  const props = new Map<string, ProcessorPropType>()
-
-  const internal: InternalAudio = {
-    src,
-    processors,
-    props,
-    setupProcessors: setup,
-    connectProcessors: connect,
-    reconnectProcessors: reconnect,
-    get,
-    set,
-    load,
-    renderBarChart: (canvas, color) => drawBarChart(
-      canvas,
-      color,
-      source instanceof MediaElementAudioSourceNode ? source.mediaElement.src : source as unknown as string,
+  if (typeof value === 'string') {
+    const source = context.createBufferSource()
+    return {
       context,
-    ),
-    renderTimeDomainBarChart: (canvas, color) => drawTimeDomainBarChart(
-      canvas,
-      color,
-      processors.find(v => v.name === 'analyser')!.node as any,
-    ),
+      source,
+      src: value,
+      load: async () => {
+        source.buffer = await fetchAudioBuffer(value, context)
+      },
+      clone: () => {
+        const buffer = source.buffer
+        const clone = context.createBufferSource()
+        clone.buffer = buffer
+        return clone
+      },
+    }
+  } else if (value instanceof AudioBuffer) {
+    const source = context.createBufferSource()
+    source.buffer = value
+    return {
+      context,
+      source,
+      clone: () => {
+        const buffer = source.buffer
+        const clone = context.createBufferSource()
+        clone.buffer = buffer
+        return clone
+      },
+    }
+  } else if (context instanceof AudioContext && value instanceof HTMLMediaElement) {
+    return {
+      context,
+      source: context.createMediaElementSource(value),
+      src: value.src,
+    }
+  } else {
+    return {
+      context,
+      source: value as AudioSource,
+    }
+  }
+}
+
+export function createAudio<T extends BaseAudioContext = AudioAnyContext>(value: string, context?: T): BufferAudio<T>
+export function createAudio<T extends BaseAudioContext = AudioAnyContext>(value: AudioBuffer, context?: T): BufferAudio<T>
+export function createAudio<T extends BaseAudioContext = AudioAnyContext>(value: HTMLMediaElement, context?: T): MediaElementAudio<T>
+export function createAudio<T extends BaseAudioContext = AudioAnyContext>(value: AudioSource, context?: T): BufferAudio<T> | MediaElementAudio<T> | ScheduledAudio<T>
+export function createAudio(value: AudioInput, context?: AudioAnyContext) {
+  const { load, clone, ...attrs } = resovleInput(value, context)
+
+  const internal: {
+    src?: string
+    load?: () => Promise<void>
+    stop?: () => void
+  } & InternalAudio = {
+    ...attrs,
+    processors: [] as Processor[],
+    props: new Map<string, ProcessorPropType>(),
+    setup() {
+      resetProcessors(this.processors)
+      this.processors = []
+      this.processors = createProcessors({
+        source: this.source,
+        context: this.context,
+        reconnect: () => {
+          resetProcessors(this.processors)
+          setupProcessors(this.processors)
+        },
+      })
+      this.props.clear()
+      processorsToProps(this.processors).forEach((v, k) => this.props.set(k, v))
+      setupProcessors(this.processors)
+    },
+    get(name: string) {
+      return this.props.get(toCameCase(name))?.getter?.()
+    },
+    set(name: string, value: any) {
+      return this.props.get(toCameCase(name))?.setter?.(value)
+    },
+    renderBarChart(canvas, color) {
+      return drawBarChart(
+        canvas,
+        color,
+        this.source instanceof MediaElementAudioSourceNode ? this.source.mediaElement.src : this.source as unknown as string,
+        this.context,
+      )
+    },
+    renderTimeDomainBarChart(canvas, color) {
+      return drawTimeDomainBarChart(
+        canvas,
+        color,
+        this.processors.find(v => v.name === 'analyser')!.node as any,
+      )
+    },
   }
 
-  async function setup() {
-    processors.push(
-      ...(
-        await createProcessors({
-          source,
-          context,
-          reconnect,
-        })
-      ),
-    )
-    props.clear()
-    processorsToProps(processors)
-      .forEach((v, k) => props.set(k, v))
-  }
-
-  function connect() {
-    setupProcessors(processors)
-  }
-
-  function reconnect() {
-    resetProcessors(processors)
-    setupProcessors(processors)
-  }
-
-  function get(name: string) {
-    return props.get(toCameCase(name))?.getter?.()
-  }
-
-  function set(name: string, value: any) {
-    return props.get(toCameCase(name))?.setter?.(value)
-  }
-
-  async function load() {
-    if (source instanceof AudioBufferSourceNode && src) {
-      source.buffer = await fetchAudioBuffer(src, context)
-      await setup()
-      connect()
+  if (load) {
+    internal.load = async function () {
+      await load()
+      this.setup()
     }
   }
 
-  return new Proxy(source, {
-    get(target: AudioSource, prop: string | symbol): any {
-      return getBindProp(internal, prop) || getBindProp(target, prop)
+  if (clone) {
+    internal.stop = function () {
+      this.source = clone()
+      this.setup()
+    }
+  }
+
+  if (!(internal.source instanceof AudioBufferSourceNode)) internal.setup()
+
+  return new Proxy(internal, {
+    get(target: any, prop: string | symbol): any {
+      return getBindProp(target, prop) ?? getBindProp(target.source, prop)
     },
-    set(target: AudioSource, prop: string | symbol, value: any): boolean {
-      if (prop in internal) {
-        (internal as any)[prop] = value
-      } else {
+    set(target: any, prop: string | symbol, value: any): boolean {
+      if (prop in target) {
         (target as any)[prop] = value
+      } else {
+        (target.source as any)[prop] = value
       }
       return true
     },

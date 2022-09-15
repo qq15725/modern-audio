@@ -6,11 +6,9 @@ export function defineProcessor(processorFactory: ProcessorFactory) {
   return processorFactory
 }
 
-export async function createProcessors(env: AudioEnv, factories?: ProcessorFactory[]) {
-  return await Promise.all(
-    createProcessorFactories(factories)
-      .map(factory => factory(env)),
-  )
+export function createProcessors(env: AudioEnv, factories?: ProcessorFactory[]) {
+  return createProcessorFactories(factories)
+    .map(factory => factory(env))
 }
 
 export function getProcessorNode(processor: Processor) {

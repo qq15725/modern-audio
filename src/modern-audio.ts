@@ -17,12 +17,10 @@ export class ModernAudio extends HTMLAudioElement {
 
   protected async setup() {
     this.setupListeners()
-    await this.source.setupProcessors()
     for (let i = 0; i < this.attributes.length; i++) {
       const attribute = this.attributes.item(i)
       if (attribute) this.source.set(attribute.name, attribute.value)
     }
-    this.source.connectProcessors()
   }
 
   protected setupListeners() {
