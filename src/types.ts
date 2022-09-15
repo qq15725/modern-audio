@@ -28,7 +28,7 @@ export type ScheduledAudio<T extends BaseAudioContext = AudioContext> = { contex
 
 export interface Processor {
   name: string
-  node: AudioNode | ProcessorNodeFunction
+  node?: AudioNode | ProcessorNodeFunction
   connect?: (target: AudioNode) => void
   disconnect?: () => void
   props?: Record<string, ProcessorPropType>

@@ -1,7 +1,9 @@
 import { Analyser } from './analyser'
 import { Destination } from './destination'
+import { Loop } from './loop'
 import { NoiseReduction } from './noise-reduction'
 import { Panner } from './panner'
+import { PlaybackRate } from './playback-rate'
 import { Source } from './source'
 import { Volume } from './volume'
 
@@ -12,6 +14,8 @@ export function createProcessorFactories(userProcessorFactories?: ProcessorFacto
 
   return [
     Source,
+    PlaybackRate,
+    Loop,
     NoiseReduction,
     Volume,
     Panner,
