@@ -46,6 +46,7 @@ import { createAudio } from 'modern-audio'
 
 const audio = createAudio('./test/assets/audio.mp3')
 
+await audio.load()
 audio.set('db', 1)
 audio.set('pan', 0.1)
 audio.set('fadeIn', 3)
@@ -66,6 +67,7 @@ const context = createOfflineAudioContext(10)
 
 const audio = createAudio('./test/assets/audio.mp3', context)
 
+await audio.load()
 audio.set('db', 1)
 audio.set('pan', 0.1)
 audio.set('fadeIn', 3)
@@ -74,6 +76,7 @@ audio.set('noiseReduction', true)
 
 const audio1 = createAudio('./test/assets/audio.mp3', context)
 
+await audio1.load()
 audio1.set('db', 0)
 audio1.set('pan', 0)
 audio1.set('fadeIn', 0)

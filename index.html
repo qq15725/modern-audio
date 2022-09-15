@@ -38,6 +38,8 @@
   const context = createOfflineAudioContext(10)
   const audio = createAudio('./test/assets/audio.mp3', context)
 
+  audio.load()
+
   document.querySelector('#bar-chart').onclick = () => {
     audio.renderBarChart(document.querySelector('canvas'))
   }

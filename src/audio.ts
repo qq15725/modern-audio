@@ -12,26 +12,56 @@ export function createAudio(userSource: string | HTMLMediaElement | AudioSource,
   const context = userContext ?? new AudioContext()
 
   let source: AudioSource
+  let src: string | undefined
   if (typeof userSource === 'string') {
     source = context.createBufferSource()
+    src = userSource
   } else if (context instanceof AudioContext && userSource instanceof HTMLMediaElement) {
     source = context.createMediaElementSource(userSource)
+    src = userSource.src
   } else {
     source = userSource as AudioSource
   }
 
   const processors: Processor[] = []
-  let props = new Map<string, ProcessorPropType>()
+  const props = new Map<string, ProcessorPropType>()
+
+  const internal: InternalAudio = {
+    src,
+    processors,
+    props,
+    setupProcessors: setup,
+    connectProcessors: connect,
+    reconnectProcessors: reconnect,
+    get,
+    set,
+    load,
+    renderBarChart: (canvas, color) => drawBarChart(
+      canvas,
+      color,
+      source instanceof MediaElementAudioSourceNode ? source.mediaElement.src : source as unknown as string,
+      context,
+    ),
+    renderTimeDomainBarChart: (canvas, color) => drawTimeDomainBarChart(
+      canvas,
+      color,
+      processors.find(v => v.name === 'analyser')!.node as any,
+    ),
+  }
 
   async function setup() {
     processors.push(
-      ...(await createProcessors({
-        source,
-        context,
-        reconnect,
-      })),
+      ...(
+        await createProcessors({
+          source,
+          context,
+          reconnect,
+        })
+      ),
     )
-    props = processorsToProps(processors)
+    props.clear()
+    processorsToProps(processors)
+      .forEach((v, k) => props.set(k, v))
   }
 
   function connect() {
@@ -52,33 +82,11 @@ export function createAudio(userSource: string | HTMLMediaElement | AudioSource,
   }
 
   async function load() {
-    if (source instanceof AudioBufferSourceNode && typeof userSource === 'string') {
-      source.buffer = await fetchAudioBuffer(userSource, context)
+    if (source instanceof AudioBufferSourceNode && src) {
+      source.buffer = await fetchAudioBuffer(src, context)
       await setup()
       connect()
     }
-  }
-
-  load()
-
-  const internal: InternalAudio = {
-    processors,
-    setupProcessors: setup,
-    connectProcessors: connect,
-    reconnectProcessors: reconnect,
-    get,
-    set,
-    renderBarChart: (canvas, color) => drawBarChart(
-      canvas,
-      color,
-      source instanceof MediaElementAudioSourceNode ? source.mediaElement.src : source as unknown as string,
-      context,
-    ),
-    renderTimeDomainBarChart: (canvas, color) => drawTimeDomainBarChart(
-      canvas,
-      color,
-      processors.find(v => v.name === 'analyser')!.node as any,
-    ),
   }
 
   return new Proxy(source, {

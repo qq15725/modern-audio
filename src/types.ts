@@ -7,7 +7,10 @@ export interface AudioEnv {
 }
 
 export interface InternalAudio {
+  src?: string
   processors: Processor[]
+  props: Map<string, ProcessorPropType>
+  load: () => Promise<void>
   setupProcessors: () => Promise<void>
   connectProcessors: () => void
   reconnectProcessors: () => void
@@ -17,9 +20,9 @@ export interface InternalAudio {
   set: (name: string, value: any) => any
 }
 
-export type BufferAudio<T extends BaseAudioContext = AudioContext> = { context: T } & InternalAudio & AudioBufferSourceNode
+export type BufferAudio<T extends BaseAudioContext = AudioContext> = { src: string; context: T } & InternalAudio & AudioBufferSourceNode
 
-export type MediaElementAudio<T extends BaseAudioContext = AudioContext> = { context: T } & InternalAudio & MediaElementAudioSourceNode
+export type MediaElementAudio<T extends BaseAudioContext = AudioContext> = { src: string; context: T } & InternalAudio & MediaElementAudioSourceNode
 
 export type ScheduledAudio<T extends BaseAudioContext = AudioContext> = { context: T } & InternalAudio & AudioScheduledSourceNode
 
