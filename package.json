@@ -1,6 +1,6 @@
 {
   "name": "modern-audio",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "packageManager": "pnpm@7.0.0",
   "description": "A modern web audio lib",
   "main": "dist/modern-audio.js",
