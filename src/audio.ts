@@ -61,7 +61,7 @@ export function createAudio(value: AudioInput, context?: AudioAnyContext) {
   const internal: {
     src?: string
     load?: () => Promise<void>
-    stop?: () => void
+    reset?: () => void
   } & InternalAudio = {
     ...attrs,
     processors: [] as Processor[],
@@ -112,7 +112,7 @@ export function createAudio(value: AudioInput, context?: AudioAnyContext) {
   }
 
   if (clone) {
-    internal.stop = function () {
+    internal.reset = function () {
       this.source = clone()
       this.setup()
     }

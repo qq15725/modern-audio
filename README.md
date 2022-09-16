@@ -57,6 +57,12 @@ audio.set('loop', true)
 
 // onclick after call
 audio.start()
+
+// Pause
+// audio.reset()
+
+// Play
+// audio.start(0, audio.context.currentTime)
 ```
 
 ### Export multiple audio as single wav file

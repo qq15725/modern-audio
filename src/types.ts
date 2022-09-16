@@ -25,7 +25,7 @@ export interface InternalAudio<T extends BaseAudioContext = AudioAnyContext, D e
 export type BufferAudio<T extends BaseAudioContext = AudioAnyContext> = {
   src: string
   load: () => Promise<void>
-  stop: () => void
+  reset: () => void
 } & InternalAudio<T, AudioBufferSourceNode> & AudioBufferSourceNode
 
 export type MediaElementAudio<T extends BaseAudioContext = AudioAnyContext> = {

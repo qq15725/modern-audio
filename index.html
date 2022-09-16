@@ -48,7 +48,7 @@
     el.dataset.playing = !isPlaying
     if (isPlaying) {
       el.innerHTML = 'Play'
-      audio.stop()
+      audio.reset()
     } else {
       el.innerHTML = 'Pause'
       audio.start(0, audio.context.currentTime)
