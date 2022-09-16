@@ -4,12 +4,6 @@ export type AudioSource = MediaElementAudioSourceNode | AudioScheduledSourceNode
 
 export type AudioInput = string | AudioBuffer | HTMLMediaElement | AudioSource
 
-export interface AudioEnv {
-  source: AudioSource
-  context: AudioAnyContext
-  reconnect(): void
-}
-
 export interface InternalAudio<T extends BaseAudioContext = AudioAnyContext, D extends AudioSource = AudioSource> {
   context: T
   source: D
@@ -57,5 +51,5 @@ export interface ProcessorNodeFunction {
 }
 
 export interface ProcessorFactory {
-  (env: AudioEnv): Processor
+  (audio: InternalAudio): Processor
 }

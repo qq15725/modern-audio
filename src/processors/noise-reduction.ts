@@ -1,6 +1,8 @@
 import { defineProcessor } from '../processor'
 
-export const NoiseReduction = defineProcessor(({ context, reconnect }) => {
+export const NoiseReduction = defineProcessor((audio) => {
+  const { context } = audio
+
   let enable = false
 
   const filter = context.createBiquadFilter()
@@ -34,7 +36,7 @@ export const NoiseReduction = defineProcessor(({ context, reconnect }) => {
           if (value === '') value = true
           if (enable === value) return
           this.value = enable = value
-          reconnect()
+          audio.reconnect()
         },
       },
     },

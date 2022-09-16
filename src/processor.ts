@@ -1,14 +1,14 @@
 import { createProcessorFactories } from './processors'
 
-import type { AudioEnv, Processor, ProcessorFactory, ProcessorPropType } from './types'
+import type { InternalAudio, Processor, ProcessorFactory, ProcessorPropType } from './types'
 
 export function defineProcessor(processorFactory: ProcessorFactory) {
   return processorFactory
 }
 
-export function createProcessors(env: AudioEnv, factories?: ProcessorFactory[]) {
+export function createProcessors(audio: InternalAudio, factories?: ProcessorFactory[]) {
   return createProcessorFactories(factories)
-    .map(factory => factory(env))
+    .map(factory => factory(audio))
 }
 
 export function getProcessorNode({ node }: Processor) {
