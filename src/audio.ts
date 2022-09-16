@@ -84,8 +84,14 @@ export function createAudio(value: AudioInput, context?: AudioAnyContext) {
     get(name: string) {
       return this.props.get(toCameCase(name))?.getter?.()
     },
-    set(name: string, value: any) {
-      return this.props.get(toCameCase(name))?.setter?.(value)
+    set(name: string | Record<string, any>, value?: any) {
+      if (typeof name === 'string') {
+        this.props.get(toCameCase(name))?.setter?.(value)
+      } else {
+        for (const key in name) {
+          this.set(key, name[key])
+        }
+      }
     },
     renderBarChart(canvas, color) {
       return drawBarChart(

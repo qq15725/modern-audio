@@ -47,13 +47,16 @@ import { createAudio } from 'modern-audio'
 const audio = createAudio('./test/assets/audio.mp3')
 await audio.load()
 
-audio.set('db', 1)
-audio.set('pan', 0.1)
-audio.set('fadeIn', 3)
-audio.set('fadeOut', 5)
-audio.set('noiseReduction', true)
-audio.set('playbackRate', 2)
-audio.set('loop', true)
+audio.set({
+  db: 1,
+  pan: 0.1,
+  // fadeIn: 3,
+  fadeIn: { at: 0, duration: 3 },
+  fadeOut: 5,
+  noiseReduction: true,
+  playbackRate: 2,
+  loop: true,
+})
 
 // onclick after call
 audio.start()

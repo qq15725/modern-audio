@@ -19,7 +19,7 @@ export interface InternalAudio<T extends BaseAudioContext = AudioAnyContext, D e
   renderBarChart: (canvas: HTMLCanvasElement, color?: string) => void
   renderTimeDomainBarChart: (canvas: HTMLCanvasElement, color?: string) => void
   get: (name: string) => any
-  set: (name: string, value: any) => any
+  set: (name: string | Record<string, any>, value?: any) => any
 }
 
 export type BufferAudio<T extends BaseAudioContext = AudioAnyContext> = {

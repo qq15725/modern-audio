@@ -5,8 +5,8 @@ export const Volume = defineProcessor(({ context, source }) => {
   const node = context.createGain()
 
   const props = {
-    fadeIn: 0,
-    fadeOut: 0,
+    fadeIn: 0 as number | { at: number; duration: number },
+    fadeOut: 0 as number | { at: number; duration: number },
   }
 
   return {
@@ -22,23 +22,30 @@ export const Volume = defineProcessor(({ context, source }) => {
       },
       fadeIn: {
         getter: () => props.fadeIn,
-        setter: (time: number) => {
-          time = Number(time)
-          props.fadeIn = time
-          const now = context.currentTime
-          node.gain.setValueAtTime(0.01, now)
-          node.gain.exponentialRampToValueAtTime(node.gain.value, now + time)
+        setter: (value: number | { at: number; duration: number }) => {
+          props.fadeIn = value
+          const { at, duration } = typeof value === 'object'
+            ? value
+            : {
+                at: context.currentTime,
+                duration: Number(value),
+              }
+          node.gain.setValueAtTime(0.01, at)
+          node.gain.exponentialRampToValueAtTime(node.gain.value, at + duration)
         },
       },
       fadeOut: {
         getter: () => props.fadeOut,
-        setter: (time: number) => {
-          time = Number(time)
-          props.fadeOut = time
-          const duration = getSourceDuration(source) / getSourcePlaybackRate(source)
-          const now = context.currentTime
-          node.gain.setValueAtTime(node.gain.value, now + duration - time)
-          node.gain.exponentialRampToValueAtTime(0.01, now + duration)
+        setter: (value: number | { at: number; duration: number }) => {
+          props.fadeOut = value
+          const { at, duration } = typeof value === 'object'
+            ? value
+            : {
+                at: context.currentTime + getSourceDuration(source) / getSourcePlaybackRate(source) - Number(value),
+                duration: Number(value),
+              }
+          node.gain.setValueAtTime(node.gain.value, at)
+          node.gain.exponentialRampToValueAtTime(0.01, at + duration)
         },
       },
     },
