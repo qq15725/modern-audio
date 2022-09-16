@@ -11,23 +11,33 @@
   src="./test/assets/audio.mp3"
   controls
   pan="0"
-  fade-in="10"
-  fade-out="108"
+  fade-in="3"
+  fade-out="3"
 >
 </audio>
-
-<canvas></canvas>
 
 <div style="margin-bottom: 10px;">
   <button id="play">Play</button>
 </div>
 
 <div style="margin-bottom: 10px;">
+  <button id="download">Download</button>
+</div>
+
+<div style="margin-bottom: 10px;">
+  <button id="time-domain-bar-chart">TimeDomainBarChart</button>
+</div>
+
+<div style="margin-bottom: 10px;">
   <button id="bar-chart">BarChart</button>
 </div>
 
-<div>
-  <button id="download">Download</button>
+<div style="margin-bottom: 10px;">
+  <canvas id="time-domain-bar-chart-canvas"></canvas>
+</div>
+
+<div style="margin-bottom: 10px;">
+  <canvas id="bar-chart-canvas"></canvas>
 </div>
 
 <script type="module">
@@ -41,7 +51,9 @@
 
   const audio = await createAudio('./test/assets/audio.mp3')
   await audio.load()
-  audio.set('playbackRate', 1.2)
+  audio.set({
+    playbackRate: 1.2,
+  })
   document.querySelector('#play').onclick = (e) => {
     const el = e.target
     const isPlaying = el.dataset.playing === 'true'
@@ -54,9 +66,8 @@
       audio.start(0, audio.context.currentTime)
     }
   }
-  document.querySelector('#bar-chart').onclick = () => {
-    audio.renderBarChart(document.querySelector('canvas'))
-  }
+  document.querySelector('#bar-chart').onclick = () => audio.renderBarChart(document.querySelector('#bar-chart-canvas'))
+  document.querySelector('#time-domain-bar-chart').onclick = () => audio.renderTimeDomainBarChart(document.querySelector('#time-domain-bar-chart-canvas'))
 
   const context = createOfflineAudioContext(10)
   const offlineAudio = createAudio('./test/assets/audio.mp3', context)

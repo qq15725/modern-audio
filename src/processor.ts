@@ -11,10 +11,8 @@ export function createProcessors(env: AudioEnv, factories?: ProcessorFactory[]) 
     .map(factory => factory(env))
 }
 
-export function getProcessorNode(processor: Processor) {
-  return typeof processor.node === 'function'
-    ? processor.node()
-    : processor.node
+export function getProcessorNode({ node }: Processor) {
+  return typeof node === 'function' ? node() : node
 }
 
 export function setupProcessors(processors: Processor[]) {

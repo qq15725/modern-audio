@@ -4,26 +4,27 @@ import { getSourceDuration, getSourcePlaybackRate } from '../source'
 export const Volume = defineProcessor(({ context, source }) => {
   const node = context.createGain()
 
-  const props = {
-    fadeIn: 0 as number | { at: number; duration: number },
-    fadeOut: 0 as number | { at: number; duration: number },
-  }
-
   return {
     name: 'volume',
     node,
     props: {
       db: {
-        getter: () => Math.log(node.gain.value) / Math.LN10,
-        setter: (value: number) => {
-          value = Number(value)
+        value: 1,
+        getter() {
+          return this.value
+        },
+        setter(value: number) {
+          this.value = value = Number(value)
           node.gain.value = Math.pow(10, value / 20)
         },
       },
       fadeIn: {
-        getter: () => props.fadeIn,
-        setter: (value: number | { at: number; duration: number }) => {
-          props.fadeIn = value
+        value: 0 as number | { at: number; duration: number },
+        getter() {
+          return this.value
+        },
+        setter(value: number | { at: number; duration: number }) {
+          this.value = value
           const { at, duration } = typeof value === 'object'
             ? value
             : {
@@ -35,9 +36,12 @@ export const Volume = defineProcessor(({ context, source }) => {
         },
       },
       fadeOut: {
-        getter: () => props.fadeOut,
-        setter: (value: number | { at: number; duration: number }) => {
-          props.fadeOut = value
+        value: 0 as number | { at: number; duration: number },
+        getter() {
+          return this.value
+        },
+        setter(value: number | { at: number; duration: number }) {
+          this.value = value
           const { at, duration } = typeof value === 'object'
             ? value
             : {

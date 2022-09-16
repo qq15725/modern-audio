@@ -62,27 +62,31 @@ export function createAudio(value: AudioInput, context?: AudioAnyContext) {
     src?: string
     load?: () => Promise<void>
     reset?: () => void
+    resetAndStart?: (when?: number, offset?: number, duration?: number) => void
   } & InternalAudio = {
     ...attrs,
     processors: [] as Processor[],
     props: new Map<string, ProcessorPropType>(),
     setup() {
       resetProcessors(this.processors)
-      this.processors = []
-      this.processors = createProcessors({
-        source: this.source,
-        context: this.context,
-        reconnect: () => {
-          resetProcessors(this.processors)
-          setupProcessors(this.processors)
-        },
-      })
-      this.props.clear()
-      processorsToProps(this.processors).forEach((v, k) => this.props.set(k, v))
+      this.processors = createProcessors(this)
+      this.props = processorsToProps(this.processors)
       setupProcessors(this.processors)
     },
-    get(name: string) {
-      return this.props.get(toCameCase(name))?.getter?.()
+    reconnect() {
+      resetProcessors(this.processors)
+      setupProcessors(this.processors)
+    },
+    get(name?: string) {
+      if (!name) {
+        const props = {} as Record<string, any>
+        this.props.forEach((prop, key) => {
+          props[key] = this.get(key)
+        })
+        return props
+      } else {
+        return this.props.get(toCameCase(name))?.getter?.()
+      }
     },
     set(name: string | Record<string, any>, value?: any) {
       if (typeof name === 'string') {
@@ -120,7 +124,14 @@ export function createAudio(value: AudioInput, context?: AudioAnyContext) {
   if (clone) {
     internal.reset = function () {
       this.source = clone()
+      const props = this.get()
       this.setup()
+      this.set(props)
+    }
+
+    internal.resetAndStart = function (when?: number, offset?: number, duration?: number) {
+      this.reset?.()
+      ;(this.source as AudioBufferSourceNode).start(when, offset, duration)
     }
   }
 

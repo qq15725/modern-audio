@@ -8,8 +8,13 @@ export const Panner = defineProcessor(({ context }) => {
     node,
     props: {
       pan: {
-        getter: () => node.pan.value,
-        setter: (value: number) => node.pan.value = Number(value),
+        value: node.pan.value,
+        getter() {
+          return this.value
+        },
+        setter(value: number) {
+          this.value = node.pan.value = Number(value)
+        },
       },
     },
   }

@@ -7,7 +7,7 @@ export type AudioInput = string | AudioBuffer | HTMLMediaElement | AudioSource
 export interface AudioEnv {
   source: AudioSource
   context: AudioAnyContext
-  reconnect: () => void
+  reconnect(): void
 }
 
 export interface InternalAudio<T extends BaseAudioContext = AudioAnyContext, D extends AudioSource = AudioSource> {
@@ -15,17 +15,21 @@ export interface InternalAudio<T extends BaseAudioContext = AudioAnyContext, D e
   source: D
   processors: Processor[]
   props: Map<string, ProcessorPropType>
-  setup: () => void
-  renderBarChart: (canvas: HTMLCanvasElement, color?: string) => void
-  renderTimeDomainBarChart: (canvas: HTMLCanvasElement, color?: string) => void
-  get: (name: string) => any
-  set: (name: string | Record<string, any>, value?: any) => any
+  setup(): void
+  reconnect(): void
+  renderBarChart(canvas: HTMLCanvasElement, color?: string): void
+  renderTimeDomainBarChart(canvas: HTMLCanvasElement, color?: string): void
+  get(): Record<string, any>
+  get(name: string): any
+  set(name: Record<string, any>): void
+  set(name: string, value: any): void
 }
 
 export type BufferAudio<T extends BaseAudioContext = AudioAnyContext> = {
   src: string
-  load: () => Promise<void>
-  reset: () => void
+  load(): Promise<void>
+  reset(): void
+  resetAndStart(when?: number, offset?: number, duration?: number): void
 } & InternalAudio<T, AudioBufferSourceNode> & AudioBufferSourceNode
 
 export type MediaElementAudio<T extends BaseAudioContext = AudioAnyContext> = {
@@ -37,14 +41,15 @@ export type ScheduledAudio<T extends BaseAudioContext = AudioAnyContext> = Inter
 export interface Processor {
   name: string
   node?: AudioNode | ProcessorNodeFunction
-  connect?: (target: AudioNode) => void
-  disconnect?: () => void
+  connect?(target: AudioNode): void
+  disconnect?(): void
   props?: Record<string, ProcessorPropType>
 }
 
 export interface ProcessorPropType<T = any, D = T> {
-  getter?: () => T
-  setter?: (value: D) => void
+  value?: T
+  getter?(): T
+  setter?(value: D): void
 }
 
 export interface ProcessorNodeFunction {
